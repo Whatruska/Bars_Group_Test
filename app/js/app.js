@@ -4,6 +4,56 @@ document.addEventListener("DOMContentLoaded", function() {
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     let storage = window.localStorage;
     let table = document.getElementById("table");
+    let deleteBtn = document.getElementById("delete");
+    let clearBtn = document.getElementById("clear");
+    let selectedRow = [];
+    let vertInd = 0;
+
+    clearBtn.onclick = (e) => {
+        selectedRow = [];
+        let rows = table.getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++){
+            let row = rows.item(i);
+            row.removeAttribute("style");
+            row.removeAttribute("selected");
+        }
+    }
+
+    deleteBtn.onclick = (e) => {
+        selectedRow = [];
+        let rowsToDelete = [];
+        let rows = table.getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++){
+            let row = rows.item(i);
+            if (row.getAttribute("selected") !== null){
+                console.log(i);
+                rowsToDelete.push(row);
+                storage.removeItem(getPhone(row));
+                storage.removeItem(getAddress(row));
+                storage.removeItem(getCompanyName(row));
+            }
+        }
+        rowsToDelete.forEach((elem) => {
+            table.removeChild(elem);
+        });
+        if (rows.length === 1) showEmptySlide();
+    }
+
+    let showEmptySlide = () => {
+        let container = document.getElementById("container");
+        container.removeChild(table);
+        let slide = document.createElement("div");
+        let h2 = document.createElement("h2");
+        slide.appendChild(h2);
+        h2.innerText = "There`s no info... Add some!";
+        container.appendChild(slide);
+        deleteBtn.setAttribute("disabled","");
+        clearBtn.setAttribute("disabled","");
+    }
+
+    let hideEmptySlide = () => {
+
+    }
 
     let getRow = (vertInd) => {
         return table.getElementsByTagName("tr")[parseInt(vertInd) + 1];
@@ -22,11 +72,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let getAddress = (row) => {
-        return getColumnInRow(row, 1).innerText;
+        return getColumnInRow(row, 2).innerText;
     }
 
     let getPhone = (row) => {
-        return getColumnInRow(row, 2).innerText;
+        return getColumnInRow(row, 1).innerText;
     }
 
     /*
@@ -88,10 +138,27 @@ document.addEventListener("DOMContentLoaded", function() {
         input.focus();
     }
 
-    let vertInd = 0;
+    let handleClick = (e) => {
+        let target = e.currentTarget;
+        let selected = target.getAttribute("selected");
+        let style = target.style;
+        let vertIndex = target.getElementsByTagName("td")[0].getAttribute("vertIndex");
+        if (selected === null){
+            style.backgroundColor = "blue";
+            target.setAttribute("selected","");
+            selectedRow.push(vertIndex);
+        } else {
+            style.backgroundColor = "transparent";
+            target.removeAttribute("selected");
+            selectedRow = selectedRow.filter(el => el !== vertIndex);
+        }
+    }
 
     let createRow = (data) => {
         let row = document.createElement("tr");
+        row.onclick = (e) => {
+            handleClick(e);
+        }
         let keys = Object.keys(data);
         keys.forEach((key, index) => {
             let td = document.createElement("td");
@@ -99,7 +166,9 @@ document.addEventListener("DOMContentLoaded", function() {
             td.setAttribute("horIndex", index);
             td.setAttribute("vertIndex", vertInd);
             td.setAttribute("key", key);
-            td.ondblclick = handleDoubleClick;
+            td.ondblclick = (e) => {
+                handleDoubleClick(e);
+            }
             row.appendChild(td);
         });
         table.appendChild(row);
@@ -130,11 +199,13 @@ document.addEventListener("DOMContentLoaded", function() {
             let fullname = storage[phone];
             createRow({
                 company : fullname,
-                address : address,
-                phone : phone
+                phone : phone,
+                address : address
             });
         }
+        if (vertInd === 0) showEmptySlide();
     }
 
+    //uploadJson();
     buildTableFromStorage();
 });

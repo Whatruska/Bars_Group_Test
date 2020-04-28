@@ -1,11 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     let requestURL = 'https://whatruska.github.io/Bars_Group_Test/app/lpu.json';
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
+
     let storage = window.localStorage;
     let table = document.getElementById("table");
     let deleteBtn = document.getElementById("delete");
     let clearBtn = document.getElementById("clear");
+    let addBtn = document.getElementById("add");
+    let body = document.getElementsByTagName("body").item(0);
+    let header = document.getElementsByTagName("header").item(0);
+    let main = document.getElementsByTagName("main").item(0);
     let selectedRow = [];
     let vertInd = 0;
 
@@ -37,6 +41,66 @@ document.addEventListener("DOMContentLoaded", function() {
             table.removeChild(elem);
         });
         if (rows.length === 1) showEmptySlide();
+    }
+
+    let hideModal = (e, modal) => {
+        body.removeChild(modal);
+        main.style.filter = "";
+        header.style.filter = "";
+    }
+
+    addBtn.onclick = (e) => {
+        let modal = document.createElement("div");
+        let style = modal.style;
+        style.position = "absolute";
+        style.backgroundColor = "red";
+        style.top = "0"
+        style.right = "0"
+        style.zIndex = 15
+        style.width = "100%"
+        style.height = "100%"
+        style.backgroundColor = "transparent"
+        style.display = "flex"
+        style.flexDirection = "column"
+        style.justifyContent = "center"
+        style.alignItems = "center"
+
+        let form = document.createElement("form");
+        let span = document.createElement("span");
+        span.setAttribute("className", "heading");
+        span.innerText = "Add new info"
+        form.appendChild(span);
+        form.style.backgroundColor = "white"
+        form.style.display = "flex"
+        form.style.flexDirection = "column"
+        form.style.justifyContent = "center"
+        form.style.alignContent = "center"
+        let input = document.createElement("input");
+        input.setAttribute("id","full_name");
+        form.appendChild(input);
+        input = document.createElement("input");
+        input.setAttribute("id","phone");
+        form.appendChild(input);
+        input = document.createElement("input");
+        input.setAttribute("id","address");
+        form.appendChild(input);
+        form.focus();
+        form.onmouseleave = (e) => {
+            hideModal(e, modal);
+        }
+        let button = document.createElement("button");
+        button.innerText = "Add"
+        form.appendChild(button);
+
+        modal.appendChild(form);
+
+        main.style.transition = "0.7s all linear";
+        main.style.filter = "blur(10px)"
+
+        header.style.transition = "0.7s all linear";
+        header.style.filter = "blur(10px)"
+
+        body.appendChild(modal);
     }
 
     let showEmptySlide = () => {

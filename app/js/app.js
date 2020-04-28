@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let updateStore = (newValue, type, row) => {
         switch (type) {
-            case "company" : {
+            case "full_name" : {
                 let phone = getPhone(row);
                 storage.setItem(phone, newValue);
                 break;
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(elem)
             let address = elem['address'];
             let phone = elem['phone'];
-            let fullName = elem['company'];
+            let fullName = elem['full_name'];
 
             storage.setItem(phone, fullName);
             storage.setItem(fullName, address);
@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let phone = storage[address];
             let fullname = storage[phone];
             createRow({
-                company : fullname,
+                full_name : fullname,
                 phone : phone,
                 address : address
             });

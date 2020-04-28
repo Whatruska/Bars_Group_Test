@@ -1,0 +1,52 @@
+[
+  {
+    "company": "Podunk",
+    "phone": "+7 (994) 443-3385",
+    "address": "Hampton Place, Marysville, house 266"
+  },
+  {
+    "company": "Isoplex",
+    "phone": "+7 (908) 526-2050",
+    "address": "Newport Street, Newkirk, house 167"
+  },
+  {
+    "company": "Aquazure",
+    "phone": "+7 (826) 598-2465",
+    "address": "Apollo Street, Sutton, house 675"
+  },
+  {
+    "company": "Isotronic",
+    "phone": "+7 (925) 558-2568",
+    "address": "Kathleen Court, Newry, house 806"
+  },
+  {
+    "company": "Digial",
+    "phone": "+7 (962) 489-2609",
+    "address": "Woodhull Street, Defiance, house 373"
+  },
+  {
+    "company": "Bostonic",
+    "phone": "+7 (988) 544-3355",
+    "address": "Debevoise Avenue, Ronco, house 541"
+  },
+  {
+    "company": "Junipoor",
+    "phone": "+7 (899) 402-2678",
+    "address": "Varet Street, Bancroft, house 619"
+  },
+  {
+    "company": "Pharmex",
+    "phone": "+7 (844) 552-2530",
+    "address": "Tabor Court, Fresno, house 480"
+  },
+  {
+    "company": "Zolarity",
+    "phone": "+7 (960) 586-3537",
+    "address": "Miller Place, Brady, house 745"
+  },
+  {
+    "company": "Atgen",
+    "phone": "+7 (848) 571-3224",
+    "address": "Stillwell Avenue, Lowell, house 158"
+  }
+]

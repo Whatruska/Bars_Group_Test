@@ -1,3 +1,5 @@
+
+
 document.addEventListener("DOMContentLoaded", function() {
 
     let requestURL = 'https://whatruska.github.io/Bars_Group_Test/app/lpu.json';
@@ -10,10 +12,32 @@ document.addEventListener("DOMContentLoaded", function() {
     let body = document.getElementsByTagName("body").item(0);
     let header = document.getElementsByTagName("header").item(0);
     let main = document.getElementsByTagName("main").item(0);
+    let container = document.getElementById("container");
     let selectedRow = [];
+    let names = {};
+    let phones = {};
+    let addresses = {};
     let vertInd = 0;
 
-    clearBtn.onclick = (e) => {
+    let refreshStorage = () => {
+        storage.setItem("names", JSON.stringify(names));
+        storage.setItem("phones", JSON.stringify(phones));
+        storage.setItem("addresses", JSON.stringify(addresses));
+    }
+
+    let setClass = (elem, className) => {
+        elem.setAttribute("class", className);
+    }
+
+    let setId = (elem, id) => {
+        elem.setAttribute("id", id);
+    }
+
+    let setPlaceholder = (elem, placeholder) => {
+        elem.setAttribute("placeholder", placeholder);
+    }
+
+    let clear = (e) => {
         selectedRow = [];
         let rows = table.getElementsByTagName("tr");
         for (let i = 0; i < rows.length; i++){
@@ -21,6 +45,10 @@ document.addEventListener("DOMContentLoaded", function() {
             row.removeAttribute("style");
             row.removeAttribute("selected");
         }
+    }
+
+    clearBtn.onclick = (e) => {
+        clear(e);
     }
 
     deleteBtn.onclick = (e) => {
@@ -32,9 +60,10 @@ document.addEventListener("DOMContentLoaded", function() {
             if (row.getAttribute("selected") !== null){
                 console.log(i);
                 rowsToDelete.push(row);
-                storage.removeItem(getPhone(row));
-                storage.removeItem(getAddress(row));
-                storage.removeItem(getCompanyName(row));
+                delete phones[getPhone(row)];
+                delete addresses[getAddress(row)];
+                delete names[getCompanyName(row)];
+                refreshStorage();
             }
         }
         rowsToDelete.forEach((elem) => {
@@ -49,40 +78,90 @@ document.addEventListener("DOMContentLoaded", function() {
         header.style.filter = "";
     }
 
+    /*
+
+    phone -> name
+    name -> address
+    address -> phone
+
+    */
+
+    let handleAddSubmit = (e, modal) => {
+        e.preventDefault();
+        let isValid = true;
+        let inputs = modal.getElementsByTagName("input");
+        let data = {};
+        for (let i = 0; i < inputs.length; i++){
+            let input = inputs.item(i);
+            let key = input.getAttribute("id");
+            let text = input.value;
+            let error = document.createElement("span");
+            let spans = modal.getElementsByTagName("span");
+            input.style.borderColor = "black";
+            console.log(spans.length)
+            if (spans.length > 1){
+                modal.removeChild(spans.item(spans.length - 1));
+            }
+            if (text.length === 0){
+                isValid = false;
+                setClass(error, "error");
+                error.innerText = "Empty field"
+                input.style.borderBottomColor = "red";
+                modal.appendChild(error);
+                break;
+            } else if (storage.getItem(text) !== null) {
+                isValid = false;
+                setClass(error, "error");
+                error.innerText = key.charAt(0).toUpperCase() + key.substring(1) + " is not unique"
+                input.style.borderBottomColor = "red";
+                modal.appendChild(error)
+                break;
+            } else {
+                data[key] = text;
+                console.log(data);
+            }
+        }
+        if (isValid){
+            storage.setItem(data['phone'], data['full_name']);
+            storage.setItem(data['full_name'], data['address']);
+            storage.setItem(data['address'], data['phone']);
+            hideEmptySlide();
+            createRow({
+                full_name: data['full_name'],
+                phone: data['phone'],
+                address: data['address']
+            })
+            hideModal(e, modal);
+        }
+    }
+
     addBtn.onclick = (e) => {
         let modal = document.createElement("div");
-        let style = modal.style;
-        style.position = "absolute";
-        style.backgroundColor = "red";
-        style.top = "0"
-        style.right = "0"
-        style.zIndex = 15
-        style.width = "100%"
-        style.height = "100%"
-        style.backgroundColor = "transparent"
-        style.display = "flex"
-        style.flexDirection = "column"
-        style.justifyContent = "center"
-        style.alignItems = "center"
+        setClass(modal, "modal");
 
         let form = document.createElement("form");
         let span = document.createElement("span");
-        span.setAttribute("className", "heading");
+
+        setClass(span, "heading")
         span.innerText = "Add new info"
+
         form.appendChild(span);
-        form.style.backgroundColor = "white"
-        form.style.display = "flex"
-        form.style.flexDirection = "column"
-        form.style.justifyContent = "center"
-        form.style.alignContent = "center"
+
         let input = document.createElement("input");
-        input.setAttribute("id","full_name");
+        setId(input, "full_name");
+        setPlaceholder(input, "Name");
+        input.setAttribute("autocomplete","off");
         form.appendChild(input);
         input = document.createElement("input");
-        input.setAttribute("id","phone");
+        setId(input, "phone");
+        input.setAttribute("type","phone");
+        setPlaceholder(input, "Phone");
+        input.setAttribute("autocomplete","off");
         form.appendChild(input);
         input = document.createElement("input");
-        input.setAttribute("id","address");
+        setId(input, "address");
+        setPlaceholder(input, "Address");
+        input.setAttribute("autocomplete","off");
         form.appendChild(input);
         form.focus();
         form.onmouseleave = (e) => {
@@ -90,6 +169,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         let button = document.createElement("button");
         button.innerText = "Add"
+        button.onclick = (e) => handleAddSubmit(e, modal)
+
         form.appendChild(button);
 
         modal.appendChild(form);
@@ -104,7 +185,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let showEmptySlide = () => {
-        let container = document.getElementById("container");
         container.removeChild(table);
         let slide = document.createElement("div");
         let h2 = document.createElement("h2");
@@ -116,7 +196,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let hideEmptySlide = () => {
-
+        container.removeChild(container.getElementsByTagName("div").item(0));
+        container.appendChild(table);
     }
 
     let getRow = (vertInd) => {
@@ -155,22 +236,24 @@ document.addEventListener("DOMContentLoaded", function() {
         switch (type) {
             case "full_name" : {
                 let phone = getPhone(row);
-                storage.setItem(phone, newValue);
+                phones[phone] = newValue;
                 break;
             }
 
             case "address" : {
                 let name = getCompanyName(row);
-                storage.setItem(name, newValue);
+                names[name] = newValue;
                 break;
             }
 
             case "phone" : {
                 let address = getAddress(row);
-                storage.setItem(address, newValue);
+                addresses[address] = newValue;
                 break;
             }
         }
+
+        refreshStorage();
     }
 
     let handleBlur = (e,horIndex, vertIndex) => {
@@ -187,6 +270,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let handleDoubleClick = (e) => {
+        clear(e);
         let target = e.target;
         let vertInd = target.getAttribute("vertIndex");
         let horInd = target.getAttribute("horIndex");
@@ -208,11 +292,13 @@ document.addEventListener("DOMContentLoaded", function() {
         let style = target.style;
         let vertIndex = target.getElementsByTagName("td")[0].getAttribute("vertIndex");
         if (selected === null){
-            style.backgroundColor = "blue";
+            style.backgroundColor = "#89099c";
+            style.color = "white"
             target.setAttribute("selected","");
             selectedRow.push(vertIndex);
         } else {
             style.backgroundColor = "transparent";
+            style.color = "black"
             target.removeAttribute("selected");
             selectedRow = selectedRow.filter(el => el !== vertIndex);
         }
@@ -239,6 +325,14 @@ document.addEventListener("DOMContentLoaded", function() {
         vertInd++;
     }
 
+    /*
+
+    phone -> name
+    name -> address
+    address -> phone
+
+    */
+
     let uploadJson = () => fetch(requestURL).then((response) => response.json()).then((data) => {
         storage.clear();
         data.forEach(elem => {
@@ -247,20 +341,24 @@ document.addEventListener("DOMContentLoaded", function() {
             let phone = elem['phone'];
             let fullName = elem['full_name'];
 
-            storage.setItem(phone, fullName);
-            storage.setItem(fullName, address);
-            storage.setItem(address, phone);
+            phones[phone] = fullName;
+            names[fullName] = address;
+            addresses[address] = phone;
 
-            createRow(elem)
+            refreshStorage();
+            createRow(elem);
         });
     });
 
     let buildTableFromStorage = () => {
-        let keys = Object.keys(storage).sort((a, b) => b.length - a.length);
-        for (let i = 0; i < storage.length / 3; i++){
+        names = JSON.parse(storage.getItem("names"));
+        phones = JSON.parse(storage.getItem("phones"));
+        addresses = JSON.parse(storage.getItem("addresses"));
+        let keys = Object.keys(addresses);
+        for (let i = 0; i < keys.length; i++){
             let address = keys[i];
-            let phone = storage[address];
-            let fullname = storage[phone];
+            let phone = addresses[address];
+            let fullname = phones[phone];
             createRow({
                 full_name : fullname,
                 phone : phone,

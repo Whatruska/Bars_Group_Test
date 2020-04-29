@@ -3,9 +3,8 @@
 	"version": "5.0.0",
 	"description": "OptimizedHTML 5 - Start HTML Template",
 	"main": "index.js",
-	"homepage": "https://whatruska.github.io/Bars_Group_Test/",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "WebDesign Master",
 	"license": "ISC",

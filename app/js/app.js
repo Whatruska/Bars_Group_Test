@@ -49,23 +49,42 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         updateStorage = (newValue, type, row) => {
+            let primaryMap = {};
+            let secondaryMap = {};
+            let primaryField = "";
+            let secondaryField = "";
             switch (type) {
                 case "full_name" : {
-                    let phone = getPhone(row);
-                    this.phones[phone] = newValue;
+                    secondaryMap = this.phones;
+                    primaryField = getPhone(row);
+                    primaryMap = this.names;
+                    secondaryField = getAddress(row);
                     break;
                 }
 
                 case "address" : {
-                    let name = getCompanyName(row);
-                    this.names[name] = newValue;
+                    secondaryMap = this.names;
+                    primaryField = getCompanyName(row);
+                    primaryMap = this.addresses;
+                    secondaryField = getPhone(row);
                     break;
                 }
 
                 case "phone" : {
-                    let address = getAddress(row);
-                    this.addresses[address] = newValue;
+                    secondaryMap = this.addresses;
+                    primaryField = getAddress(row);
+                    secondaryField = getCompanyName(row);
+                    primaryMap = this.phones;
                     break;
+                }
+            }
+
+            secondaryMap[primaryField] = newValue;
+            let keys = Object.keys(primaryMap);
+            for (let i = 0; i < keys.length; i++){
+                if (primaryMap[keys[i]] === secondaryField){
+                    delete primaryMap[keys[i]];
+                    primaryMap[newValue] = secondaryField;
                 }
             }
 
@@ -352,7 +371,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let newText = input.value;
         let key = parent.getAttribute("key");
         if (newText.length > 0){
-            storage.updateStore(newText, key, row);
+            storage.updateStorage(newText, key, row);
             parent.removeChild(input);
             parent.innerText = newText;
         }
@@ -448,9 +467,9 @@ document.addEventListener("DOMContentLoaded", function() {
         for (let i = 0; i < keys.length; i++){
             let address = keys[i];
             let phone = addresses[address];
-            let fullname = phones[phone];
+            let full_name = phones[phone];
             createRow({
-                full_name : fullname,
+                full_name : full_name,
                 phone : phone,
                 address : address
             });

@@ -58,7 +58,6 @@ document.addEventListener("DOMContentLoaded", function() {
         for (let i = 0; i < rows.length; i++){
             let row = rows.item(i);
             if (row.getAttribute("selected") !== null){
-                console.log(i);
                 rowsToDelete.push(row);
                 delete phones[getPhone(row)];
                 delete addresses[getAddress(row)];
@@ -86,6 +85,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
     */
 
+    let isUnique = (type, text) => {
+        console.log(type)
+        console.log(text)
+        switch (type) {
+            case "full_name" :{
+                console.log(Boolean(names[text]))
+                return !Boolean(names[text]);
+                break;
+            }
+
+            case "phone" : {
+                console.log(Boolean(phones[text]))
+                return !Boolean(phones[text]);
+                break;
+            }
+
+            case "address" : {
+                console.log(Boolean(addresses[text]))
+                return !Boolean(addresses[text]);
+                break;
+            }
+        }
+    }
+
     let handleAddSubmit = (e, modal) => {
         e.preventDefault();
         let isValid = true;
@@ -98,7 +121,6 @@ document.addEventListener("DOMContentLoaded", function() {
             let error = document.createElement("span");
             let spans = modal.getElementsByTagName("span");
             input.style.borderColor = "black";
-            console.log(spans.length)
             if (spans.length > 1){
                 modal.removeChild(spans.item(spans.length - 1));
             }
@@ -109,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 input.style.borderBottomColor = "red";
                 modal.appendChild(error);
                 break;
-            } else if (storage.getItem(text) !== null) {
+            } else if (!isUnique(key, text)) {
                 isValid = false;
                 setClass(error, "error");
                 error.innerText = key.charAt(0).toUpperCase() + key.substring(1) + " is not unique"
@@ -118,14 +140,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
             } else {
                 data[key] = text;
-                console.log(data);
             }
         }
         if (isValid){
-            storage.setItem(data['phone'], data['full_name']);
-            storage.setItem(data['full_name'], data['address']);
-            storage.setItem(data['address'], data['phone']);
-            hideEmptySlide();
+            if (addresses.length === 0) hideEmptySlide();
+            phones[data["phone"]] = data["full_name"]
+            names[data["full_name"]] = data["address"]
+            addresses[data["address"]] = data["phone"]
+            refreshStorage();
             createRow({
                 full_name: data['full_name'],
                 phone: data['phone'],

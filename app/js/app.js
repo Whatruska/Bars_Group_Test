@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let addBtn = document.getElementById("add");
     let hostBtn = document.getElementById("host");
     let fileBtn = document.getElementById("file");
+    let downloadBtn = document.getElementById("download");
     let body = document.getElementsByTagName("body").item(0);
     let header = document.getElementsByTagName("header").item(0);
     let main = document.getElementsByTagName("main").item(0);
@@ -142,6 +143,40 @@ document.addEventListener("DOMContentLoaded", function() {
             this.setAddresses({});
             this.refreshStorage();
         }
+
+        getData = () => {
+            let allData = [];
+            let addresses = Object.keys(this.addresses);
+            for (let i = 0; i < addresses.length; i++){
+                let address = addresses[i];
+                let phone = this.addresses[address];
+                let full_name = this.phones[phone];
+                allData.push({
+                    full_name : full_name,
+                    phone : phone,
+                    address : address
+                });
+            }
+            return JSON.stringify(allData);
+        }
+    }
+
+    downloadBtn.onclick = (e) => {
+        download("lpu.json")
+    }
+
+    let download = (filename) => {
+        let element = document.createElement('a');
+        let text = storage.getData();
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
     }
 
     class Element {

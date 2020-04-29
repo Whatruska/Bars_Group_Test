@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let deleteBtn = document.getElementById("delete");
     let clearBtn = document.getElementById("clear");
     let addBtn = document.getElementById("add");
+    let uploadBtn = document.getElementById("upload");
     let body = document.getElementsByTagName("body").item(0);
     let header = document.getElementsByTagName("header").item(0);
     let main = document.getElementsByTagName("main").item(0);
@@ -86,23 +87,18 @@ document.addEventListener("DOMContentLoaded", function() {
     */
 
     let isUnique = (type, text) => {
-        console.log(type)
-        console.log(text)
         switch (type) {
             case "full_name" :{
-                console.log(Boolean(names[text]))
                 return !Boolean(names[text]);
                 break;
             }
 
             case "phone" : {
-                console.log(Boolean(phones[text]))
                 return !Boolean(phones[text]);
                 break;
             }
 
             case "address" : {
-                console.log(Boolean(addresses[text]))
                 return !Boolean(addresses[text]);
                 break;
             }
@@ -207,19 +203,23 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let showEmptySlide = () => {
-        container.removeChild(table);
-        let slide = document.createElement("div");
-        let h2 = document.createElement("h2");
-        slide.appendChild(h2);
-        h2.innerText = "There`s no info... Add some!";
-        container.appendChild(slide);
-        deleteBtn.setAttribute("disabled","");
-        clearBtn.setAttribute("disabled","");
+        if (container.getElementsByTagName("table").length === 1){
+            container.removeChild(table);
+            let slide = document.createElement("div");
+            let h2 = document.createElement("h2");
+            slide.appendChild(h2);
+            h2.innerText = "There`s no info... Add some!";
+            container.appendChild(slide);
+            deleteBtn.setAttribute("disabled","");
+            clearBtn.setAttribute("disabled","");
+        }
     }
 
     let hideEmptySlide = () => {
-        container.removeChild(container.getElementsByTagName("div").item(0));
-        container.appendChild(table);
+        if (container.getElementsByTagName("div").length !== 0){
+            container.removeChild(container.getElementsByTagName("div").item(0));
+            container.appendChild(table);
+        }
     }
 
     let getRow = (vertInd) => {
@@ -356,26 +356,33 @@ document.addEventListener("DOMContentLoaded", function() {
     */
 
     let uploadJson = () => fetch(requestURL).then((response) => response.json()).then((data) => {
-        storage.clear();
         data.forEach(elem => {
-            console.log(elem)
             let address = elem['address'];
             let phone = elem['phone'];
             let fullName = elem['full_name'];
-
+            createRow(elem);
             phones[phone] = fullName;
             names[fullName] = address;
             addresses[address] = phone;
-
-            refreshStorage();
-            createRow(elem);
         });
+        refreshStorage();
+        window.location.reload();
     });
 
     let buildTableFromStorage = () => {
+        hideEmptySlide();
         names = JSON.parse(storage.getItem("names"));
+        if (names === null){
+            names = {};
+        }
         phones = JSON.parse(storage.getItem("phones"));
+        if (phones === null){
+            phones = {};
+        }
         addresses = JSON.parse(storage.getItem("addresses"));
+        if (addresses === null) {
+            addresses = {};
+        }
         let keys = Object.keys(addresses);
         for (let i = 0; i < keys.length; i++){
             let address = keys[i];
@@ -387,9 +394,25 @@ document.addEventListener("DOMContentLoaded", function() {
                 address : address
             });
         }
-        if (vertInd === 0) showEmptySlide();
+        if (vertInd === 0 || storage.length === 0) showEmptySlide();
     }
 
-    //uploadJson();
+    let loadTestData = (e) => {
+        e.preventDefault();
+        let rows = table.getElementsByTagName("tr");
+        if (rows.length === 1){
+            showEmptySlide();
+        } else if (rows.length > 1) {
+            for (let i = 1; i < rows.length; i++){
+                table.removeChild(rows.item(i));
+            }
+        }
+        hideEmptySlide();
+        uploadJson();
+    }
+
+
+    uploadBtn.onclick = loadTestData;
+
     buildTableFromStorage();
 });

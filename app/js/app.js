@@ -1,5 +1,3 @@
-
-
 document.addEventListener("DOMContentLoaded", function() {
 
     let requestURL = 'https://whatruska.github.io/Bars_Group_Test/app/lpu.json';
@@ -8,14 +6,14 @@ document.addEventListener("DOMContentLoaded", function() {
     let deleteBtn = document.getElementById("delete");
     let clearBtn = document.getElementById("clear");
     let addBtn = document.getElementById("add");
-    let uploadBtn = document.getElementById("upload");
+    let hostBtn = document.getElementById("host");
+    let fileBtn = document.getElementById("file");
     let body = document.getElementsByTagName("body").item(0);
     let header = document.getElementsByTagName("header").item(0);
     let main = document.getElementsByTagName("main").item(0);
     let container = document.getElementById("container");
     let selectedRow = [];
     let vertInd = 0;
-    let storage = new Storage();
 
     class Storage {
         storage = {}
@@ -109,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
             storage.updateNameByPhone(phone, name);
             storage.updateAddressByName(name, address);
             storage.updatePhoneByAddress(address, phone);
+            storage.refreshStorage();
         }
 
         deleteData = (row) => {
@@ -117,18 +116,61 @@ document.addEventListener("DOMContentLoaded", function() {
             delete this.names[getCompanyName(row)];
         }
 
+        clean = () => {
+            window.localStorage.clear();
+            this.setNames({});
+            this.setPhones({});
+            this.setAddresses({});
+            this.refreshStorage();
+        }
     }
 
-    let setClass = (elem, className) => {
-        elem.setAttribute("class", className);
+    class Element {
+        constructor(type) {
+            return document.createElement(type)
+        }
+
+        static setClass = (elem, className) => {
+            elem.setAttribute("class", className);
+        }
+
+        static setId = (elem, id) => {
+            elem.setAttribute("id", id);
+        }
+
+        static setPlaceholder = (elem, placeholder) => {
+            elem.setAttribute("placeholder", placeholder);
+        }
     }
 
-    let setId = (elem, id) => {
-        elem.setAttribute("id", id);
-    }
+    let storage = new Storage();
 
-    let setPlaceholder = (elem, placeholder) => {
-        elem.setAttribute("placeholder", placeholder);
+    fileBtn.onchange = (e) => {
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            let contents = event.target.result;
+            let data = JSON.parse(contents);
+            storage.clean();
+            console.log(storage)
+            data.forEach((obj) => {
+                let name = obj["full_name"];
+                let phone = obj["phone"];
+                let address = obj["address"];
+                storage.addNewRecord(name,phone,address);
+            });
+            let rows = table.getElementsByTagName("tr");
+            for (let i = rows.length - 1; i > 0; i--){
+                table.removeChild(rows.item(i));
+            }
+            buildTableFromStorage();
+        };
+
+        reader.onerror = function(event) {
+            console.error("Файл не может быть прочитан! код " + event.target.error.code);
+        };
+
+        reader.readAsText(file);
     }
 
     let clear = (e) => {
@@ -178,7 +220,8 @@ document.addEventListener("DOMContentLoaded", function() {
             let input = inputs.item(i);
             let key = input.getAttribute("id");
             let text = input.value;
-            let error = document.createElement("span");
+            let error = new Element("span");
+            Element.setClass(error, "error");
             let spans = modal.getElementsByTagName("span");
             input.style.borderColor = "black";
             if (spans.length > 1){
@@ -186,17 +229,15 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             if (text.length === 0){
                 isValid = false;
-                setClass(error, "error");
-                error.innerText = "Empty field"
+                error.innerText = ("Empty field");
                 input.style.borderBottomColor = "red";
                 modal.appendChild(error);
                 break;
             } else if (!storage.isUnique(key, text)) {
                 isValid = false;
-                setClass(error, "error");
-                error.innerText = key.charAt(0).toUpperCase() + key.substring(1) + " is not unique"
+                error.innerText = (key.charAt(0).toUpperCase() + key.substring(1) + " is not unique");
                 input.style.borderBottomColor = "red";
-                modal.appendChild(error)
+                modal.appendChild(error);
                 break;
             } else {
                 data[key] = text;
@@ -216,39 +257,39 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     addBtn.onclick = (e) => {
-        let modal = document.createElement("div");
-        setClass(modal, "modal");
+        let modal = new Element("div");
+        Element.setClass(modal,'modal');
 
-        let form = document.createElement("form");
-        let span = document.createElement("span");
+        let form = new Element("form");
+        let span = new Element("span");
 
-        setClass(span, "heading")
-        span.innerText = "Add new info"
+        Element.setClass(span,"heading");
+        span.innerText = ("Add new info");
 
         form.appendChild(span);
 
-        let input = document.createElement("input");
-        setId(input, "full_name");
-        setPlaceholder(input, "Name");
+        let input = new Element("input");
+        Element.setId(input, "full_name");
+        Element.setPlaceholder(input,"Name");
         input.setAttribute("autocomplete","off");
         form.appendChild(input);
-        input = document.createElement("input");
-        setId(input, "phone");
+        input = new Element("input");
+        Element.setId(input,"phone");
         input.setAttribute("type","phone");
-        setPlaceholder(input, "Phone");
+        Element.setPlaceholder(input,"Phone");
         input.setAttribute("autocomplete","off");
         form.appendChild(input);
-        input = document.createElement("input");
-        setId(input, "address");
-        setPlaceholder(input, "Address");
+        input = new Element("input");
+        Element.setId(input,"address");
+        Element.setPlaceholder(input,"Address");
         input.setAttribute("autocomplete","off");
         form.appendChild(input);
         form.focus();
         form.onmouseleave = (e) => {
             hideModal(e, modal);
         }
-        let button = document.createElement("button");
-        button.innerText = "Add"
+        let button = new Element("button");
+        button.innerText = ("Add");
         button.onclick = (e) => handleAddSubmit(e, modal)
 
         form.appendChild(button);
@@ -286,10 +327,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let getRow = (vertInd) => {
         return table.getElementsByTagName("tr")[parseInt(vertInd) + 1];
-    }
-
-    let getProperty = (vertIndex, horIndex) => {
-        return getRow(vertInd).getElementsByTagName("td")[horIndex].innerText;
     }
 
     let getColumnInRow = (row, horInd) => {
@@ -436,7 +473,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 
-    uploadBtn.onclick = loadTestData;
+    hostBtn.onclick = loadTestData;
 
     buildTableFromStorage();
 });

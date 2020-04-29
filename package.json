@@ -3,14 +3,18 @@
 	"version": "5.0.0",
 	"description": "OptimizedHTML 5 - Start HTML Template",
 	"main": "index.js",
+	"homepage": "https://whatruska.github.io/Bars_Group_Test/",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"predeploy": "npm run build",
+		"deploy": "gh-pages -d build"
 	},
 	"author": "WebDesign Master",
 	"license": "ISC",
 	"devDependencies": {
 		"browser-sync": "^2.26.7",
 		"del": "^5.1.0",
+		"gh-pages": "^2.2.0",
 		"gulp": "^4.0.2",
 		"gulp-autoprefixer": "^7.0.1",
 		"gulp-clean-css": "^4.3.0",

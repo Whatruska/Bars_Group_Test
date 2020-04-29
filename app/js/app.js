@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let requestURL = 'https://whatruska.github.io/Bars_Group_Test/app/lpu.json';
 
-    let storage = window.localStorage;
     let table = document.getElementById("table");
     let deleteBtn = document.getElementById("delete");
     let clearBtn = document.getElementById("clear");
@@ -15,15 +14,109 @@ document.addEventListener("DOMContentLoaded", function() {
     let main = document.getElementsByTagName("main").item(0);
     let container = document.getElementById("container");
     let selectedRow = [];
-    let names = {};
-    let phones = {};
-    let addresses = {};
     let vertInd = 0;
+    let storage = new Storage();
 
-    let refreshStorage = () => {
-        storage.setItem("names", JSON.stringify(names));
-        storage.setItem("phones", JSON.stringify(phones));
-        storage.setItem("addresses", JSON.stringify(addresses));
+    class Storage {
+        storage = {}
+
+        constructor() {
+            this.storage = window.localStorage;
+        }
+
+        getItem = (key) => {
+            return window.localStorage.getItem(key);
+        };
+
+        names = {};
+        phones = {};
+        addresses = {};
+
+        setNames = (n) => {
+            this.names = n;
+        }
+
+        setPhones = (p) => {
+            this.phones = p;
+        }
+
+        setAddresses = (a) => {
+            this.addresses = a;
+        }
+
+        refreshStorage = () => {
+            this.storage.setItem("names", JSON.stringify(this.names));
+            this.storage.setItem("phones", JSON.stringify(this.phones));
+            this.storage.setItem("addresses", JSON.stringify(this.addresses));
+        }
+
+        updateStorage = (newValue, type, row) => {
+            switch (type) {
+                case "full_name" : {
+                    let phone = getPhone(row);
+                    this.phones[phone] = newValue;
+                    break;
+                }
+
+                case "address" : {
+                    let name = getCompanyName(row);
+                    this.names[name] = newValue;
+                    break;
+                }
+
+                case "phone" : {
+                    let address = getAddress(row);
+                    this.addresses[address] = newValue;
+                    break;
+                }
+            }
+
+            this.refreshStorage();
+        }
+
+        isUnique = (type, text) => {
+            switch (type) {
+                case "full_name" :{
+                    return !Boolean(this.names[text]);
+                    break;
+                }
+
+                case "phone" : {
+                    return !Boolean(this.phones[text]);
+                    break;
+                }
+
+                case "address" : {
+                    return !Boolean(this.addresses[text]);
+                    break;
+                }
+            }
+        }
+
+        updateNameByPhone = (phone, name) => {
+            this.phones[phone] = name;
+        }
+
+        updateAddressByName = (name, address) => {
+            this.names[name] = address;
+        }
+
+        updatePhoneByAddress = (address, phone) => {
+            this.addresses[address] = phone;
+        }
+
+        addNewRecord = (name, phone, address) => {
+            storage.updateNameByPhone(phone, name);
+            storage.updateAddressByName(name, address);
+            storage.updatePhoneByAddress(address, phone);
+        }
+
+        deleteData = (row) => {
+            delete this.phones[getPhone(row)];
+            delete this.addresses[getAddress(row)];
+            delete this.names[getCompanyName(row)];
+        }
+
     }
 
     let setClass = (elem, className) => {
@@ -60,10 +153,8 @@ document.addEventListener("DOMContentLoaded", function() {
             let row = rows.item(i);
             if (row.getAttribute("selected") !== null){
                 rowsToDelete.push(row);
-                delete phones[getPhone(row)];
-                delete addresses[getAddress(row)];
-                delete names[getCompanyName(row)];
-                refreshStorage();
+                storage.deleteData(row);
+                storage.refreshStorage();
             }
         }
         rowsToDelete.forEach((elem) => {
@@ -76,33 +167,6 @@ document.addEventListener("DOMContentLoaded", function() {
         body.removeChild(modal);
         main.style.filter = "";
         header.style.filter = "";
-    }
-
-    /*
-
-    phone -> name
-    name -> address
-    address -> phone
-
-    */
-
-    let isUnique = (type, text) => {
-        switch (type) {
-            case "full_name" :{
-                return !Boolean(names[text]);
-                break;
-            }
-
-            case "phone" : {
-                return !Boolean(phones[text]);
-                break;
-            }
-
-            case "address" : {
-                return !Boolean(addresses[text]);
-                break;
-            }
-        }
     }
 
     let handleAddSubmit = (e, modal) => {
@@ -127,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 input.style.borderBottomColor = "red";
                 modal.appendChild(error);
                 break;
-            } else if (!isUnique(key, text)) {
+            } else if (!storage.isUnique(key, text)) {
                 isValid = false;
                 setClass(error, "error");
                 error.innerText = key.charAt(0).toUpperCase() + key.substring(1) + " is not unique"
@@ -139,11 +203,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
         if (isValid){
-            if (addresses.length === 0) hideEmptySlide();
-            phones[data["phone"]] = data["full_name"]
-            names[data["full_name"]] = data["address"]
-            addresses[data["address"]] = data["phone"]
-            refreshStorage();
+            if (storage.getItem("addresses").length === 0) hideEmptySlide();
+            storage.addNewRecord(data["full_name"], data["phone"], data["address"]);
+            storage.refreshStorage();
             createRow({
                 full_name: data['full_name'],
                 phone: data['phone'],
@@ -246,38 +308,6 @@ document.addEventListener("DOMContentLoaded", function() {
         return getColumnInRow(row, 1).innerText;
     }
 
-    /*
-
-        phone -> name
-        name -> address
-        address -> phone
-
-    */
-
-    let updateStore = (newValue, type, row) => {
-        switch (type) {
-            case "full_name" : {
-                let phone = getPhone(row);
-                phones[phone] = newValue;
-                break;
-            }
-
-            case "address" : {
-                let name = getCompanyName(row);
-                names[name] = newValue;
-                break;
-            }
-
-            case "phone" : {
-                let address = getAddress(row);
-                addresses[address] = newValue;
-                break;
-            }
-        }
-
-        refreshStorage();
-    }
-
     let handleBlur = (e,horIndex, vertIndex) => {
         let input = e.target;
         let row = getRow(vertIndex);
@@ -285,7 +315,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let newText = input.value;
         let key = parent.getAttribute("key");
         if (newText.length > 0){
-            updateStore(newText, key, row);
+            storage.updateStore(newText, key, row);
             parent.removeChild(input);
             parent.innerText = newText;
         }
@@ -347,42 +377,36 @@ document.addEventListener("DOMContentLoaded", function() {
         vertInd++;
     }
 
-    /*
-
-    phone -> name
-    name -> address
-    address -> phone
-
-    */
-
     let uploadJson = () => fetch(requestURL).then((response) => response.json()).then((data) => {
         data.forEach(elem => {
             let address = elem['address'];
             let phone = elem['phone'];
             let fullName = elem['full_name'];
             createRow(elem);
-            phones[phone] = fullName;
-            names[fullName] = address;
-            addresses[address] = phone;
+            storage.addNewRecord(fullName, phone, address);
         });
-        refreshStorage();
+        storage.refreshStorage();
         window.location.reload();
     });
 
     let buildTableFromStorage = () => {
+
         hideEmptySlide();
-        names = JSON.parse(storage.getItem("names"));
+        let names = JSON.parse(storage.getItem("names"));
         if (names === null){
             names = {};
         }
-        phones = JSON.parse(storage.getItem("phones"));
+        storage.setNames(names);
+        let phones = JSON.parse(storage.getItem("phones"));
         if (phones === null){
             phones = {};
         }
-        addresses = JSON.parse(storage.getItem("addresses"));
+        storage.setPhones(phones);
+        let addresses = JSON.parse(storage.getItem("addresses"));
         if (addresses === null) {
             addresses = {};
         }
+        storage.setAddresses(addresses);
         let keys = Object.keys(addresses);
         for (let i = 0; i < keys.length; i++){
             let address = keys[i];

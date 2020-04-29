@@ -9,28 +9,30 @@
 	<meta name="viewport" content="width=device-width">
 	<link rel="icon" href="images/favicon.png">
 	<link rel="stylesheet" href="css/app.min.css">
+	<script src="https://kit.fontawesome.com/d35cb3e062.js" crossorigin="anonymous"></script>
 
 </head>
 
 <body>
 	<header>
-		<h1>Header</h1>
-		<div id="toolbar">
+		<h1>Bars group test app</h1>
+		<div id="toolbar" class="row">
 			<button id="delete">
-				Delete selected
+				<i class="fas fa-trash"></i>
 			</button>
 			<button id="clear">
-				Clear selected
+				<i class="fas fa-eraser"></i>
 			</button>
 			<button id="add">
-				Add row
+				<i class="fas fa-plus"></i>
 			</button>
 			<button id="host">
-				Upload info from host
+				<i class="fas fa-cloud-download-alt"></i>
 			</button>
 			<input id="file" type="file"/>
+			<label for="file"><i class="fas fa-file-import"></i></label>
 			<button id="download">
-				Download data
+				<i class="fas fa-file-export"></i>
 			</button>
 		</div>
 	</header>

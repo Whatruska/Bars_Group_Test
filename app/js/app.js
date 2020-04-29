@@ -429,6 +429,16 @@ document.addEventListener("DOMContentLoaded", function() {
         input.focus();
     }
 
+    let checkDisabled = (e) => {
+        if (selectedRow.length === 0){
+            deleteBtn.setAttribute("disabled","");
+            clearBtn.setAttribute("disabled","");
+        } else {
+            deleteBtn.removeAttribute("disabled");
+            clearBtn.removeAttribute("disabled");
+        }
+    }
+
     let handleClick = (e) => {
         let target = e.currentTarget;
         let selected = target.getAttribute("selected");
@@ -439,11 +449,13 @@ document.addEventListener("DOMContentLoaded", function() {
             style.color = "white"
             target.setAttribute("selected","");
             selectedRow.push(vertIndex);
+            checkDisabled();
         } else {
             style.backgroundColor = "transparent";
             style.color = "black"
             target.removeAttribute("selected");
             selectedRow = selectedRow.filter(el => el !== vertIndex);
+            checkDisabled();
         }
     }
 
@@ -529,5 +541,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     hostBtn.onclick = loadTestData;
 
+    checkDisabled()
     buildTableFromStorage();
 });

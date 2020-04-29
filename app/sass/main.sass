@@ -9,12 +9,37 @@ input
   text-align: center
   width: fit-content
 
+button
+  background-color: black
+  color: white
+  border: 0px solid black
+  border-radius: 5px
+  cursor: pointer
+  outline: none
+  &:hover
+   background-color : $accent
+
+[disabled]
+  cursor: no-drop
+  background-color: #666666
+  &:hover
+    background-color: #666666
+
+i,label
+  font-size: 16px
+  padding: 5px 5px
+
 td
   padding: 5px 5px
   text-align: center
 
 #table
   width: 100%
+
+#toolbar
+  justify-content: flex-start
+  input,button,label
+    margin-left: 15px
 
 .table-heading
   font-weight: bold
@@ -29,3 +54,31 @@ td
 .col
   display: flex
   flex-direction: column
+
+[type="file"]
+  border: 0
+  clip: rect(0, 0, 0, 0)
+  height: 1px
+  overflow: hidden
+  padding: 0
+  position: absolute !important
+  white-space: nowrap
+  width: 1px
+
+
+[type="file"] + label
+  background-color: black
+  border-radius: 5px
+  color: #fff
+  cursor: pointer
+  display: inline-block
+
+[type="file"]:focus + label,
+[type="file"] + label:hover
+  background-color: $accent
+
+[type="file"]:focus + label
+  outline: none
+
+
+

@@ -51,6 +51,7 @@ const imagemin     = require('gulp-imagemin');
 const newer        = require('gulp-newer');
 const rsync        = require('gulp-rsync');
 const del          = require('del');
+const babel		   = require('gulp-babel');
 
 function browsersync() {
 	browserSync.init({
@@ -63,6 +64,23 @@ function browsersync() {
 function scripts() {
 	return src(paths.scripts.src)
 	.pipe(concat(paths.jsOutputName))
+	.pipe(babel({
+		presets : [
+			[
+				"@babel/preset-env",
+				{
+					"targets": {
+						"chrome": "60",
+						"ie" : "11"
+					}
+				}
+			]
+		],
+		plugins : [
+			"@babel/plugin-proposal-class-properties",
+			"@babel/plugin-syntax-class-properties"
+		]
+	}))
 	.pipe(uglify())
 	.pipe(dest(paths.scripts.dest))
 	.pipe(browserSync.stream())

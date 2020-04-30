@@ -1,18 +1,21 @@
+"use strict"
 document.addEventListener("DOMContentLoaded", function() {
 
     let requestURL = 'https://whatruska.github.io/Bars_Group_Test/app/lpu.json';
 
     let table = document.getElementById("table");
+    let body = document.getElementsByTagName("body").item(0);
+    let header = document.getElementsByTagName("header").item(0);
+    let main = document.getElementsByTagName("main").item(0);
+    let container = document.getElementById("container");
+
     let deleteBtn = document.getElementById("delete");
     let clearBtn = document.getElementById("clear");
     let addBtn = document.getElementById("add");
     let hostBtn = document.getElementById("host");
     let fileBtn = document.getElementById("file");
     let downloadBtn = document.getElementById("download");
-    let body = document.getElementsByTagName("body").item(0);
-    let header = document.getElementsByTagName("header").item(0);
-    let main = document.getElementsByTagName("main").item(0);
-    let container = document.getElementById("container");
+
     let selectedRow = [];
     let vertInd = 0;
 
@@ -81,10 +84,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             secondaryMap[primaryField] = newValue;
-            let keys = Object.keys(primaryMap);
-            for (let i = 0; i < keys.length; i++){
-                if (primaryMap[keys[i]] === secondaryField){
-                    delete primaryMap[keys[i]];
+            for (let key in primaryMap){
+                if (primaryMap[key] === secondaryField){
+                    delete primaryMap[key];
                     primaryMap[newValue] = secondaryField;
                 }
             }
@@ -146,9 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         getData = () => {
             let allData = [];
-            let addresses = Object.keys(this.addresses);
-            for (let i = 0; i < addresses.length; i++){
-                let address = addresses[i];
+            for (let address in this.addresses){
                 let phone = this.addresses[address];
                 let full_name = this.phones[phone];
                 allData.push({
@@ -159,24 +159,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             return JSON.stringify(allData);
         }
-    }
-
-    downloadBtn.onclick = (e) => {
-        download("lpu.json")
-    }
-
-    let download = (filename) => {
-        let element = document.createElement('a');
-        let text = storage.getData();
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
     }
 
     class Element {
@@ -199,35 +181,28 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let storage = new Storage();
 
-    fileBtn.onchange = (e) => {
-        let file = e.target.files[0];
-        let reader = new FileReader();
-        reader.onload = function(event) {
-            let contents = event.target.result;
-            let data = JSON.parse(contents);
-            storage.clean();
-            console.log(storage)
-            data.forEach((obj) => {
-                let name = obj["full_name"];
-                let phone = obj["phone"];
-                let address = obj["address"];
-                storage.addNewRecord(name,phone,address);
-            });
-            let rows = table.getElementsByTagName("tr");
-            for (let i = rows.length - 1; i > 0; i--){
-                table.removeChild(rows.item(i));
-            }
-            buildTableFromStorage();
-        };
+    let downloadFile = (filename) => {
+        let element = document.createElement('a');
+        let text = storage.getData();
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
 
-        reader.onerror = function(event) {
-            console.error("Файл не может быть прочитан! код " + event.target.error.code);
-        };
+        element.style.display = 'none';
+        document.body.appendChild(element);
 
-        reader.readAsText(file);
+        element.click();
+
+        document.body.removeChild(element);
     }
 
-    let clear = (e) => {
+    let clearTable = () => {
+        let rows = table.getElementsByTagName("tr");
+        for (let i = rows.length - 1; i > 0; i--){
+            table.removeChild(rows.item(i));
+        }
+    }
+
+    let clearSelected = (e) => {
         selectedRow = [];
         let rows = table.getElementsByTagName("tr");
         for (let i = 0; i < rows.length; i++){
@@ -235,28 +210,6 @@ document.addEventListener("DOMContentLoaded", function() {
             row.removeAttribute("style");
             row.removeAttribute("selected");
         }
-    }
-
-    clearBtn.onclick = (e) => {
-        clear(e);
-    }
-
-    deleteBtn.onclick = (e) => {
-        selectedRow = [];
-        let rowsToDelete = [];
-        let rows = table.getElementsByTagName("tr");
-        for (let i = 0; i < rows.length; i++){
-            let row = rows.item(i);
-            if (row.getAttribute("selected") !== null){
-                rowsToDelete.push(row);
-                storage.deleteData(row);
-                storage.refreshStorage();
-            }
-        }
-        rowsToDelete.forEach((elem) => {
-            table.removeChild(elem);
-        });
-        if (rows.length === 1) showEmptySlide();
     }
 
     let hideModal = (e, modal) => {
@@ -298,7 +251,8 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
         if (isValid){
-            if (storage.getItem("addresses").length === 0) hideEmptySlide();
+            let address = storage.getItem("addresses");
+            if (address.length === 0) hideEmptySlide();
             storage.addNewRecord(data["full_name"], data["phone"], data["address"]);
             storage.refreshStorage();
             createRow({
@@ -308,55 +262,6 @@ document.addEventListener("DOMContentLoaded", function() {
             })
             hideModal(e, modal);
         }
-    }
-
-    addBtn.onclick = (e) => {
-        let modal = new Element("div");
-        Element.setClass(modal,'modal');
-
-        let form = new Element("form");
-        let span = new Element("span");
-
-        Element.setClass(span,"heading");
-        span.innerText = ("Add new info");
-
-        form.appendChild(span);
-
-        let input = new Element("input");
-        Element.setId(input, "full_name");
-        Element.setPlaceholder(input,"Name");
-        input.setAttribute("autocomplete","off");
-        form.appendChild(input);
-        input = new Element("input");
-        Element.setId(input,"phone");
-        input.setAttribute("type","phone");
-        Element.setPlaceholder(input,"Phone");
-        input.setAttribute("autocomplete","off");
-        form.appendChild(input);
-        input = new Element("input");
-        Element.setId(input,"address");
-        Element.setPlaceholder(input,"Address");
-        input.setAttribute("autocomplete","off");
-        form.appendChild(input);
-        form.focus();
-        form.onmouseleave = (e) => {
-            hideModal(e, modal);
-        }
-        let button = new Element("button");
-        button.innerText = ("Add");
-        button.onclick = (e) => handleAddSubmit(e, modal)
-
-        form.appendChild(button);
-
-        modal.appendChild(form);
-
-        main.style.transition = "0.7s all linear";
-        main.style.filter = "blur(10px)"
-
-        header.style.transition = "0.7s all linear";
-        header.style.filter = "blur(10px)"
-
-        body.appendChild(modal);
     }
 
     let showEmptySlide = () => {
@@ -413,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let handleDoubleClick = (e) => {
-        clear(e);
+        clearSelected(e);
         let target = e.target;
         let vertInd = target.getAttribute("vertIndex");
         let horInd = target.getAttribute("horIndex");
@@ -449,14 +354,13 @@ document.addEventListener("DOMContentLoaded", function() {
             style.color = "white"
             target.setAttribute("selected","");
             selectedRow.push(vertIndex);
-            checkDisabled();
         } else {
             style.backgroundColor = "transparent";
             style.color = "black"
             target.removeAttribute("selected");
             selectedRow = selectedRow.filter(el => el !== vertIndex);
-            checkDisabled();
         }
+        checkDisabled();
     }
 
     let createRow = (data) => {
@@ -480,17 +384,32 @@ document.addEventListener("DOMContentLoaded", function() {
         vertInd++;
     }
 
-    let uploadJson = () => fetch(requestURL).then((response) => response.json()).then((data) => {
-        data.forEach(elem => {
-            let address = elem['address'];
-            let phone = elem['phone'];
-            let fullName = elem['full_name'];
-            createRow(elem);
-            storage.addNewRecord(fullName, phone, address);
-        });
+    let uploadJson = () => {
+        let oReq = new XMLHttpRequest();
+
+        oReq.onload = function(e) {
+            let resp = e.currentTarget.response;
+            resp.forEach(elem => {
+                let address = elem['address'];
+                let phone = elem['phone'];
+                let fullName = elem['full_name'];
+                storage.addNewRecord(fullName, phone, address);
+            });
+        }
+        oReq.open("GET", requestURL);
+        oReq.responseType = "json";
+        oReq.send();
+        // fetch(requestURL).then((response) => response.json()).then((data) => {
+        // data.forEach(elem => {
+        //     let address = elem['address'];
+        //     let phone = elem['phone'];
+        //     let fullName = elem['full_name'];
+        //     createRow(elem);
+        //     storage.addNewRecord(fullName, phone, address);
+        // });
         storage.refreshStorage();
         window.location.reload();
-    });
+    };
 
     let buildTableFromStorage = () => {
 
@@ -510,9 +429,7 @@ document.addEventListener("DOMContentLoaded", function() {
             addresses = {};
         }
         storage.setAddresses(addresses);
-        let keys = Object.keys(addresses);
-        for (let i = 0; i < keys.length; i++){
-            let address = keys[i];
+        for (let address in addresses){
             let phone = addresses[address];
             let full_name = phones[phone];
             createRow({
@@ -538,9 +455,108 @@ document.addEventListener("DOMContentLoaded", function() {
         uploadJson();
     }
 
+    let initBtns = () => {
+        hostBtn.onclick = loadTestData;
+        addBtn.onclick = (e) => {
+            let modal = new Element("div");
+            Element.setClass(modal,'modal');
 
-    hostBtn.onclick = loadTestData;
+            let form = new Element("form");
+            let span = new Element("span");
 
-    checkDisabled()
+            Element.setClass(span,"heading");
+            span.innerText = ("Add new info");
+
+            form.appendChild(span);
+
+            let createInput = (id, placeholder) => {
+                let input = new Element("input");
+                Element.setId(input, id);
+                Element.setPlaceholder(input,placeholder);
+                input.setAttribute("autocomplete","off");
+                form.appendChild(input);
+                return input;
+            }
+
+            createInput("full_name", "Name");
+
+            let input = createInput("phone", "Phone");
+            input.setAttribute("type","phone");
+
+            createInput("address", "Address")
+
+            form.focus();
+            form.onmouseleave = (e) => {
+                hideModal(e, modal);
+            }
+
+            let button = new Element("button");
+            button.innerText = ("Add");
+            button.onclick = (e) => handleAddSubmit(e, modal)
+
+            form.appendChild(button);
+
+            modal.appendChild(form);
+
+            main.style.transition = "0.7s all linear";
+            main.style.filter = "blur(10px)"
+
+            header.style.transition = "0.7s all linear";
+            header.style.filter = "blur(10px)"
+
+            body.appendChild(modal);
+        }
+        clearBtn.onclick = (e) => {
+            clearSelected(e);
+            checkDisabled(e);
+        }
+        deleteBtn.onclick = (e) => {
+            selectedRow = [];
+            let rowsToDelete = [];
+            let rows = table.getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++){
+                let row = rows.item(i);
+                if (row.getAttribute("selected") !== null){
+                    rowsToDelete.push(row);
+                    storage.deleteData(row);
+                    storage.refreshStorage();
+                }
+            }
+            rowsToDelete.forEach((elem) => {
+                table.removeChild(elem);
+            });
+            if (rows.length === 1) showEmptySlide();
+            checkDisabled(e);
+        }
+        fileBtn.onchange = (e) => {
+            let file = e.target.files[0];
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let contents = event.target.result;
+                let data = JSON.parse(contents);
+                storage.clean();
+                data.forEach((obj) => {
+                    let name = obj["full_name"];
+                    let phone = obj["phone"];
+                    let address = obj["address"];
+                    storage.addNewRecord(name,phone,address);
+                });
+                clearTable();
+                buildTableFromStorage();
+            };
+
+            reader.onerror = function(event) {
+                console.error("Файл не может быть прочитан! код " + event.target.error.code);
+            };
+
+            reader.readAsText(file);
+        }
+        downloadBtn.onclick = (e) => {
+            downloadFile("lpu.json");
+        }
+    }
+
+    checkDisabled();
+    initBtns();
     buildTableFromStorage();
 });

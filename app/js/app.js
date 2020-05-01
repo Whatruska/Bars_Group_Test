@@ -181,6 +181,37 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    let pallete = {
+        //BARS GROUP BRAND DESIGN
+        brand_black: "#4F4949",
+        brand_green: "#A1C527",
+        brand_red: "#D74738",
+        brand_yellow: "#F4CB23",
+        brand_blue: "#5CB3E5",
+
+        //UI COLORS
+        primary: "#52A8B6",
+        secondary: "#DCDEE1",
+        gray: "#AEB4BB",
+        gray_dark: "#66717F",
+        gray_dark_bg: "#1D2734",
+        gray_bg: "#F4F6F9",
+        green: "#7AC1D0",
+        green_light: "#BBE4EA",
+        red : "#F27171",
+        yellow: "#F2D30C",
+        blue: "#5585B5",
+
+        // TEXT COLORS
+        text: "#1D2734",
+        text_secondary: "#66717F",
+        text_light: "#AEB4BB",
+
+        //BACKGROUND
+        bg_light: "#F4F6F9",
+        bg_dark: "#1D2734"
+    }
+
     let storage = new Storage();
 
     let downloadFile = (filename) => {
@@ -212,8 +243,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let r = [...rows];
             let index = r.indexOf(row);
             if (index % 2 === 0 && index !== 0){
-                row.style.backgroundColor = "gray"
-                row.style.color = "white"
+                row.style.backgroundColor = pallete.primary;
             }
         }
     }
@@ -236,20 +266,20 @@ document.addEventListener("DOMContentLoaded", function() {
             let error = new Element("span");
             Element.setClass(error, "error");
             let spans = modal.getElementsByTagName("span");
-            input.style.borderColor = "black";
+            input.style.borderColor = pallete.primary;
             if (spans.length > 1){
                 modal.removeChild(spans.item(spans.length - 1));
             }
             if (text.length === 0){
                 isValid = false;
                 error.innerText = ("Empty field");
-                input.style.borderBottomColor = "red";
+                input.style.borderBottomColor = pallete.red;
                 modal.appendChild(error);
                 break;
             } else if (!storage.isUnique(key, text)) {
                 isValid = false;
                 error.innerText = (key.charAt(0).toUpperCase() + key.substring(1) + " is not unique");
-                input.style.borderBottomColor = "red";
+                input.style.borderBottomColor = pallete.red;
                 modal.appendChild(error);
                 break;
             } else {
@@ -274,6 +304,7 @@ document.addEventListener("DOMContentLoaded", function() {
             container.removeChild(table);
             let slide = document.createElement("div");
             Element.setId(slide, "slide");
+            slide.style.color = pallete.text;
             let h2 = document.createElement("h2");
             slide.appendChild(h2);
             h2.innerText = "There`s no info... Add some!";
@@ -292,7 +323,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let getRow = (vertInd) => {
-        console.log(rows)
         return rows[parseInt(vertInd) + 1];
     }
 
@@ -334,12 +364,13 @@ document.addEventListener("DOMContentLoaded", function() {
         let horInd = target.getAttribute("horIndex");
 
         let input = document.createElement("input");
+        let style = input.style;
         input.value = target.innerText;
+        style.backgroundColor = pallete.bg_light;
+        style.borderBottomColor = pallete.text;
+        style.color = pallete.text;
         if (vertInd % 2 !== 0){
-            let style = input.style;
-            style.backgroundColor = "gray";
-            style.color = "white";
-            style.borderColor = "white"
+            style.backgroundColor = pallete.primary;
         }
 
         input.onblur = (e) => {
@@ -364,19 +395,17 @@ document.addEventListener("DOMContentLoaded", function() {
         let target = e.currentTarget;
         let selected = target.getAttribute("selected");
         let style = target.style;
+        style.color = pallete.text;
         let vertIndex = target.getElementsByTagName("div")[0].getAttribute("vertIndex");
         if (selected === null){
-            style.backgroundColor = "#89099c";
-            style.color = "white"
+            style.backgroundColor = pallete.blue;
             target.setAttribute("selected","");
             selectedRow.push(vertIndex);
         } else {
-            style.backgroundColor = "transparent";
-            style.color = "black"
+            style.backgroundColor = pallete.bg_light;
             let r = [...rows];
             if (r.indexOf(target) % 2 === 0){
-                style.backgroundColor = "gray"
-                style.color = "white"
+                style.backgroundColor = pallete.primary;
             }
             target.removeAttribute("selected");
             selectedRow = selectedRow.filter(el => el !== vertIndex);
@@ -404,9 +433,9 @@ document.addEventListener("DOMContentLoaded", function() {
             row.appendChild(td);
         });
         table.appendChild(row);
+        row.style.backgroundColor = pallete.bg_light;
         if (rows.length % 2 !== 0){
-            row.style.backgroundColor = "gray"
-            row.style.color = "white"
+            row.style.backgroundColor = pallete.primary;
         }
         vertInd++;
     }
@@ -435,7 +464,6 @@ document.addEventListener("DOMContentLoaded", function() {
         //     storage.addNewRecord(fullName, phone, address);
         // });
         storage.refreshStorage();
-        window.location.reload();
     };
 
     let buildTableFromStorage = () => {
@@ -480,6 +508,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         hideEmptySlide();
         uploadJson();
+        window.location.reload();
     }
 
     let restyleRows = () => {
@@ -489,15 +518,13 @@ document.addEventListener("DOMContentLoaded", function() {
             childs.forEach((child) => {
                 child.setAttribute("vertIndex", index - 1)
             })
+            row.color = pallete.text;
             if (index === 0){
-                row.style.color = "white";
-                row.style.backgroundColor = "black";
+                row.style.backgroundColor = pallete.bg_dark;
             } else if (index % 2 === 0) {
-                row.style.color = "white";
-                row.style.backgroundColor = "grey";
+                row.style.backgroundColor = pallete.primary;
             } else {
-                row.style.color = "black";
-                row.style.backgroundColor = "white";
+                row.style.backgroundColor = pallete.bg_light;
             }
         })
     }

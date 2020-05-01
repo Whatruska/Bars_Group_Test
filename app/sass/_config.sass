@@ -1,16 +1,36 @@
-// USER VARIABLES SECTION
-$accent: #89099c // Accent Color
-$accent-light: #e011ff
+//BARS GROUP BRAND DESIGN
+$brand_black: #4F4949
+$brand_green: #A1C527
+$brand_red: #D74738
+$brand_yellow: #F4CB23
+$brand_blue: #5CB3E5
+
+//UI COLORS
+$primary: #52A8B6
+$secondary: #DCDEE1
+$gray: #AEB4BB
+$gray_dark: #66717F
+$gray_dark_bg: #1D2734
+$gray_bg: #F4F6F9
+$green: #7AC1D0
+$green_light: #BBE4EA
+
+// TEXT COLORS
+$text: #1D2734
+$text_secondary: #66717F
+$text_light: #AEB4BB
+
+//BACKGROUND
+$bg_light: #F4F6F9
+$bg_dark: #1D2734
+
 $fontsize: 16px // Body Font Size
 $textcolor: #333 // Text Color
 $border: 10px // Border radius
 $system: -apple-system, BlinkMacSystemFont, Arial, sans-serif // System Font Family
 $roboto: Roboto, sans-serif // Roboto Font Family
 
-// IMPORT SECTION
-
 // FONTS LOAD SECTION
-
 @mixin font($fname, $fstyle, $fweight, $furl)
 	@font-face
 		font-family: $fname
@@ -27,24 +47,17 @@ $roboto: Roboto, sans-serif // Roboto Font Family
 // GENERAL DOCUMENT STYLES
 
 ::placeholder
-	color: #666
-
-::selection
-	background-color: $accent
-	color: #fff
-
-input, textarea
-	outline: none
-	&:focus:required:invalid
-		border-color: red
-	&:required:valid
-		border-color: green
+	color: $secondary
 
 body
+	background-color: $bg_light
 	font-family: $roboto
 	font-size: $fontsize
 	min-width: 320px
 	position: relative
 	line-height: 1.65
 	overflow-x: hidden
-	color: $textcolor
+	color: $text
+
+input
+	outline: none

@@ -16,22 +16,26 @@ $heading-size : 24px
   align-items: center
   overflow: hidden
   .heading
+    color: $text
     font-weight: bold
     font-size: $heading-size
   form
-    background-color: white
+    background-color: $bg_light
     display: flex
     flex-direction: column
     justify-content: center
     align-items: center
     padding: 20px 10px
-    border: 1px solid black
+    border: 1px solid $primary
     border-radius: 10px
     input
+      background-color: $bg_light
       margin: 10px 10px
     #address
       margin-bottom: 20px
     button
+      color: $text
+      background-color: $green
       text-transform: uppercase
       outline: none
       border-radius: 20px
@@ -41,7 +45,7 @@ $heading-size : 24px
       padding: 5px 15px
       transition: 0.2s all linear
       &:hover
-        color: white
-        background-color: $accent
+        color: $text_light
+        background-color: $green_light
 
 

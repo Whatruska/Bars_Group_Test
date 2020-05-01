@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let requestURL = 'https://whatruska.github.io/Bars_Group_Test/app/lpu.json';
 
     let table = document.getElementById("table");
+    let rows = table.getElementsByClassName("table-row");
+
     let body = document.getElementsByTagName("body").item(0);
     let header = document.getElementsByTagName("header").item(0);
     let main = document.getElementsByTagName("main").item(0);
@@ -196,7 +198,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let clearTable = () => {
-        let rows = table.getElementsByTagName("tr");
         for (let i = rows.length - 1; i > 0; i--){
             table.removeChild(rows.item(i));
         }
@@ -204,11 +205,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let clearSelected = (e) => {
         selectedRow = [];
-        let rows = table.getElementsByTagName("tr");
         for (let i = 0; i < rows.length; i++){
             let row = rows.item(i);
             row.removeAttribute("style");
             row.removeAttribute("selected");
+            let r = [...rows];
+            let index = r.indexOf(row);
+            if (index % 2 === 0 && index !== 0){
+                row.style.backgroundColor = "gray"
+                row.style.color = "white"
+            }
         }
     }
 
@@ -251,8 +257,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
         if (isValid){
-            let address = storage.getItem("addresses");
-            if (address.length === 0) hideEmptySlide();
+            hideEmptySlide();
             storage.addNewRecord(data["full_name"], data["phone"], data["address"]);
             storage.refreshStorage();
             createRow({
@@ -265,9 +270,10 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let showEmptySlide = () => {
-        if (container.getElementsByTagName("table").length === 1){
+        if (container.getElementsByTagName("div").length === 5){
             container.removeChild(table);
             let slide = document.createElement("div");
+            Element.setId(slide, "slide");
             let h2 = document.createElement("h2");
             slide.appendChild(h2);
             h2.innerText = "There`s no info... Add some!";
@@ -278,18 +284,20 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let hideEmptySlide = () => {
-        if (container.getElementsByTagName("div").length !== 0){
-            container.removeChild(container.getElementsByTagName("div").item(0));
+        let slide = document.getElementById("slide");
+        if (slide){
+            container.removeChild(slide);
             container.appendChild(table);
         }
     }
 
     let getRow = (vertInd) => {
-        return table.getElementsByTagName("tr")[parseInt(vertInd) + 1];
+        console.log(rows)
+        return rows[parseInt(vertInd) + 1];
     }
 
     let getColumnInRow = (row, horInd) => {
-        return row.getElementsByTagName("td")[horInd];
+        return row.getElementsByTagName("div")[horInd];
     }
 
     let getCompanyName = (row) => {
@@ -315,16 +323,24 @@ document.addEventListener("DOMContentLoaded", function() {
             parent.removeChild(input);
             parent.innerText = newText;
         }
+        checkDisabled()
     }
 
     let handleDoubleClick = (e) => {
         clearSelected(e);
+        checkDisabled()
         let target = e.target;
         let vertInd = target.getAttribute("vertIndex");
         let horInd = target.getAttribute("horIndex");
 
         let input = document.createElement("input");
         input.value = target.innerText;
+        if (vertInd % 2 !== 0){
+            let style = input.style;
+            style.backgroundColor = "gray";
+            style.color = "white";
+            style.borderColor = "white"
+        }
 
         input.onblur = (e) => {
             handleBlur(e, horInd, vertInd);
@@ -348,7 +364,7 @@ document.addEventListener("DOMContentLoaded", function() {
         let target = e.currentTarget;
         let selected = target.getAttribute("selected");
         let style = target.style;
-        let vertIndex = target.getElementsByTagName("td")[0].getAttribute("vertIndex");
+        let vertIndex = target.getElementsByTagName("div")[0].getAttribute("vertIndex");
         if (selected === null){
             style.backgroundColor = "#89099c";
             style.color = "white"
@@ -357,6 +373,11 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             style.backgroundColor = "transparent";
             style.color = "black"
+            let r = [...rows];
+            if (r.indexOf(target) % 2 === 0){
+                style.backgroundColor = "gray"
+                style.color = "white"
+            }
             target.removeAttribute("selected");
             selectedRow = selectedRow.filter(el => el !== vertIndex);
         }
@@ -364,13 +385,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     let createRow = (data) => {
-        let row = document.createElement("tr");
+        let row = document.createElement("div");
+        Element.setClass(row, "row table-row")
         row.onclick = (e) => {
             handleClick(e);
         }
         let keys = Object.keys(data);
         keys.forEach((key, index) => {
-            let td = document.createElement("td");
+            let td = document.createElement("div");
+            Element.setClass(td, "table-item");
             td.innerText = data[key];
             td.setAttribute("horIndex", index);
             td.setAttribute("vertIndex", vertInd);
@@ -381,6 +404,10 @@ document.addEventListener("DOMContentLoaded", function() {
             row.appendChild(td);
         });
         table.appendChild(row);
+        if (rows.length % 2 !== 0){
+            row.style.backgroundColor = "gray"
+            row.style.color = "white"
+        }
         vertInd++;
     }
 
@@ -455,6 +482,26 @@ document.addEventListener("DOMContentLoaded", function() {
         uploadJson();
     }
 
+    let restyleRows = () => {
+        let r = [...rows];
+        r.forEach((row, index) => {
+            let childs = [...row.getElementsByTagName("div")];
+            childs.forEach((child) => {
+                child.setAttribute("vertIndex", index - 1)
+            })
+            if (index === 0){
+                row.style.color = "white";
+                row.style.backgroundColor = "black";
+            } else if (index % 2 === 0) {
+                row.style.color = "white";
+                row.style.backgroundColor = "grey";
+            } else {
+                row.style.color = "black";
+                row.style.backgroundColor = "white";
+            }
+        })
+    }
+
     let initBtns = () => {
         hostBtn.onclick = loadTestData;
         addBtn.onclick = (e) => {
@@ -513,9 +560,9 @@ document.addEventListener("DOMContentLoaded", function() {
         deleteBtn.onclick = (e) => {
             selectedRow = [];
             let rowsToDelete = [];
-            let rows = table.getElementsByTagName("tr");
-            for (let i = 0; i < rows.length; i++){
-                let row = rows.item(i);
+            let r = [...rows]
+            for (let i = 0; i < r.length; i++){
+                let row = r[i];
                 if (row.getAttribute("selected") !== null){
                     rowsToDelete.push(row);
                     storage.deleteData(row);
@@ -525,7 +572,9 @@ document.addEventListener("DOMContentLoaded", function() {
             rowsToDelete.forEach((elem) => {
                 table.removeChild(elem);
             });
-            if (rows.length === 1) showEmptySlide();
+            r = [...rows]
+            if (r.length === 1) showEmptySlide();
+            restyleRows();
             checkDisabled(e);
         }
         fileBtn.onchange = (e) => {

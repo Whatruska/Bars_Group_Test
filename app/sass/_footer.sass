@@ -1,0 +1,28 @@
+@import config
+.footer
+  &-spacing
+    height: 4em
+  position: fixed
+  bottom: 0
+  background-color: black
+  width: 100%
+  color: white
+  &-social-links
+    color: $accent
+    display: flex
+    justify-content: flex-start
+    margin-bottom: 10px
+    &-item
+      color: black
+      background: $accent
+      border-radius: 10px
+      transition: 0.3s all linear
+      margin-left: 15px
+      &:nth-child(1)
+        margin-left: 0px
+      i
+        font-size: 20px
+      &:hover
+        background: none
+        background-color: white
+        color: $accent-light

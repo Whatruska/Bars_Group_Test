@@ -4,7 +4,7 @@
 <head>
 
 	<meta charset="utf-8">
-	<title>Тестовое задание</title>
+	<title>CRUD app</title>
 	<meta name="description" content="Bars Group Test App">
 	<meta name="viewport" content="width=device-width">
 	<link rel="icon" href="images/favicon.png">
@@ -14,40 +14,62 @@
 </head>
 
 <body>
-	<header>
-		<h1>Bars group test app</h1>
-		<div id="toolbar" class="row">
-			<button id="delete">
-				<i class="fas fa-trash"></i>
-			</button>
-			<button id="clear">
-				<i class="fas fa-eraser"></i>
-			</button>
-			<button id="add">
-				<i class="fas fa-plus"></i>
-			</button>
-			<button id="host">
-				<i class="fas fa-cloud-download-alt"></i>
-			</button>
-			<input id="file" type="file"/>
-			<label for="file"><i class="fas fa-file-import"></i></label>
-			<button id="download">
-				<i class="fas fa-file-export"></i>
-			</button>
-		</div>
-	</header>
+	<div class="header-container">
+		<header>
+			<h1>Bars group test app</h1>
+			<div id="toolbar" class="row">
+				<button id="delete">
+					<i class="fas fa-trash"></i>
+				</button>
+				<button id="clear">
+					<i class="fas fa-eraser"></i>
+				</button>
+				<button id="add">
+					<i class="fas fa-plus"></i>
+				</button>
+				<button id="host">
+					<i class="fas fa-cloud-download-alt"></i>
+				</button>
+				<input id="file" type="file"/>
+				<label for="file"><i class="fas fa-file-import"></i></label>
+				<button id="download">
+					<i class="fas fa-file-export"></i>
+				</button>
+			</div>
+		</header>
+	</div>
 
 	<main>
 		<div class="container" id="container">
-			<table id="table">
-				<tr class="table-heading">
-					<td>Full name</td>
-					<td>Phone</td>
-					<td>Address</td>
-				</tr>
-			</table>
+			<div id="table" class="table">
+				<div class="table-heading table-row row">
+					<div class="table-item">Full name</div>
+					<div class="table-item">Phone</div>
+					<div class="table-item">Address</div>
+				</div>
+			</div>
 		</div>
+		<div class="footer-spacing"></div>
 	</main>
+
+	<footer class="footer">
+		<div class="footer-container">
+			<div class="footer-author">
+				Made by : <strong>Vitalii Dubrovets</strong>
+			</div>
+			<div class="footer-social-links">
+				<a href="https://vk.com/vitdub" class="footer-social-links-item">
+					<i class="fab fa-vk"></i>
+				</a>
+				<a href="https://t.me/VitDub" class="footer-social-links-item">
+					<i class="fab fa-telegram-plane"></i>
+				</a>
+				<a href="mailto:dubrovets_vitalii@mail.ru" class="footer-social-links-item">
+					<i class="far fa-envelope"></i>
+				</a>
+			</div>
+		</div>
+	</footer>
 
 	<script src="js/app.min.js"></script>
 

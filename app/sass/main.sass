@@ -1,5 +1,6 @@
 @import config
 @import modal
+@import footer
 
 // CUSTOM USER STYLES & IMPORTS
 input
@@ -13,7 +14,7 @@ button
   background-color: black
   color: white
   border: 0px solid black
-  border-radius: 5px
+  border-radius: $border/2
   cursor: pointer
   outline: none
   &:hover
@@ -40,20 +41,33 @@ td
   justify-content: flex-start
   input,button,label
     margin-left: 15px
-
-.table-heading
-  font-weight: bold
-
-.container
-  margin: 0em 2em
+  button:nth-child(1)
+    margin-left: 0px
 
 .row
   display: flex
   flex-direction: row
 
+.container, .header-container, .footer-container
+  margin: 0em 2em
+
 .col
   display: flex
   flex-direction: column
+
+.table
+  &-heading
+    color: white
+    margin-top: 20px
+    background-color: black
+    font-weight: bold
+  &-row
+    justify-content: center
+  &-item
+    display: flex
+    padding: 10px 0px
+    justify-content: center
+    width: 33.333%
 
 [type="file"]
   border: 0

@@ -12,14 +12,13 @@ input
 
 button
   background-color: $green
-  color: $text
+  color: white
   border: 0px solid $green
   border-radius: $border/2
   cursor: pointer
   outline: none
   transition: 0.2s all linear
   &:hover
-    color: $text_light
     background-color : $green_light
 
 [disabled]
@@ -27,7 +26,7 @@ button
   background-color: $gray
   &:hover
     background-color: $gray
-    color: $text
+    color: white
 
 i,label
   font-size: 16px
@@ -60,7 +59,7 @@ td
 
 .table
   &-heading
-    color: $text_light
+    color: white
     margin-top: 20px
     background-color: $bg_dark
     font-weight: bold
@@ -86,7 +85,7 @@ td
 [type="file"] + label
   background-color: $green
   border-radius: 5px
-  color: $text
+  color: white
   cursor: pointer
   display: inline-block
   transition: 0.2s all linear
@@ -94,7 +93,7 @@ td
 [type="file"]:focus + label,
 [type="file"] + label:hover
   background-color: $green_light
-  color: $text_light
+  color: white
 
 [type="file"]:focus + label
   outline: none

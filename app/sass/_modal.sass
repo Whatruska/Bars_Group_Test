@@ -29,8 +29,18 @@ $heading-size : 24px
     border: 1px solid $primary
     border-radius: 10px
     input
-      background-color: $bg_light
+      background-color: transparent
+      border: 1px $gray solid
+      border-radius: 4px
+      font-size: 16px
+      text-align: left
       margin: 10px 10px
+      padding: 5px 8px
+      transition: 0.3s all linear
+      &:hover, &:active, &:focus
+        border-color: $gray_dark
+      &[error]
+        border-color: $red
     #address
       margin-bottom: 20px
     button
@@ -47,5 +57,6 @@ $heading-size : 24px
       &:hover
         color: $text_light
         background-color: $green_light
-
+.error
+  color: $red
 

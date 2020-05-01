@@ -261,24 +261,24 @@ document.addEventListener("DOMContentLoaded", function() {
             let error = new Element("span");
             Element.setClass(error, "error");
             let spans = modal.getElementsByTagName("span");
-            input.style.borderColor = pallete.primary;
             if (spans.length > 1){
                 modal.removeChild(spans.item(spans.length - 1));
             }
             if (text.length === 0){
                 isValid = false;
                 error.innerText = ("Empty field");
-                input.style.borderBottomColor = pallete.red;
+                input.setAttribute("error" , "");
                 modal.appendChild(error);
                 break;
             } else if (!storage.isUnique(key, text)) {
                 isValid = false;
                 error.innerText = (key.charAt(0).toUpperCase() + key.substring(1) + " is not unique");
-                input.style.borderBottomColor = pallete.red;
+                input.setAttribute("error" , "");
                 modal.appendChild(error);
                 break;
             } else {
                 data[key] = text;
+                input.style.borderColor = pallete.primary;
             }
         }
         if (isValid){

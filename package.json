@@ -1,7 +1,7 @@
 {
-	"name": "optimizedhtml",
+	"name": "test_app",
 	"version": "5.0.0",
-	"description": "OptimizedHTML 5 - Start HTML Template",
+	"description": "Bars group internship test app",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -15,6 +15,7 @@
 		"maintained node versions"
 	],
 	"devDependencies": {
+		"@babel/core": "^7.9.6",
 		"@babel/plugin-proposal-class-properties": "^7.8.3",
 		"@babel/plugin-syntax-class-properties": "^7.8.3",
 		"@babel/preset-env": "^7.9.6",

@@ -28,7 +28,7 @@ $fontsize: 16px // Body Font Size
 $textcolor: #333 // Text Color
 $border: 10px // Border radius
 $system: -apple-system, BlinkMacSystemFont, Arial, sans-serif // System Font Family
-$roboto: Roboto, sans-serif // Roboto Font Family
+$OpenSans: OpenSans, sans-serif // OpenSans Font Family
 
 // FONTS LOAD SECTION
 @mixin font($fname, $fstyle, $fweight, $furl)
@@ -37,12 +37,12 @@ $roboto: Roboto, sans-serif // Roboto Font Family
 		font-style: $fstyle
 		font-weight: $fweight
 		// font-display: swap // Uncomment to initially display system fonts
-		src: local($fname), url($furl) format('woff2')
+		src: local($fname), url($furl) format('ttf')
 
-@include font('Roboto', normal, 400, '../fonts/roboto-regular-webfont.woff2')
-@include font('Roboto', italic, 400, '../fonts/roboto-italic-webfont.woff2')
-@include font('Roboto', normal, 700, '../fonts/roboto-bold-webfont.woff2')
-@include font('Roboto', italic, 700, '../fonts/roboto-bolditalic-webfont.woff2')
+@include font('OpenSans', normal, 400, '../fonts/OpenSans-Regular.ttf')
+@include font('OpenSans', italic, 400, '../fonts/OpenSans-Italic.ttf')
+@include font('OpenSans', normal, 700, '../fonts/OpenSans-Bold.ttf')
+@include font('OpenSans', italic, 700, '../fonts/OpenSans-BoldItalic.ttf')
 
 // GENERAL DOCUMENT STYLES
 
@@ -51,7 +51,7 @@ $roboto: Roboto, sans-serif // Roboto Font Family
 
 body
 	background-color: $bg_light
-	font-family: $roboto
+	font-family: $OpenSans
 	font-size: $fontsize
 	min-width: 320px
 	position: relative

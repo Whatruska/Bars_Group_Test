@@ -236,15 +236,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let clearSelected = (e) => {
         selectedRow = [];
-        for (let i = 0; i < rows.length; i++){
+        for (let i = 1; i < rows.length; i++){
             let row = rows.item(i);
-            row.removeAttribute("style");
             row.removeAttribute("selected");
-            let r = [...rows];
-            let index = r.indexOf(row);
-            if (index % 2 === 0 && index !== 0){
-                row.style.backgroundColor = pallete.primary;
-            }
+            row.style.backgroundColor = pallete.bg_light;
         }
     }
 
@@ -366,12 +361,9 @@ document.addEventListener("DOMContentLoaded", function() {
         let input = document.createElement("input");
         let style = input.style;
         input.value = target.innerText;
-        style.backgroundColor = pallete.bg_light;
+        style.backgroundColor = "transparent";
         style.borderBottomColor = pallete.text;
         style.color = pallete.text;
-        if (vertInd % 2 !== 0){
-            style.backgroundColor = pallete.primary;
-        }
 
         input.onblur = (e) => {
             handleBlur(e, horInd, vertInd);
@@ -398,15 +390,12 @@ document.addEventListener("DOMContentLoaded", function() {
         style.color = pallete.text;
         let vertIndex = target.getElementsByTagName("div")[0].getAttribute("vertIndex");
         if (selected === null){
-            style.backgroundColor = pallete.blue;
+            style.backgroundColor = pallete.green;
             target.setAttribute("selected","");
             selectedRow.push(vertIndex);
         } else {
             style.backgroundColor = pallete.bg_light;
             let r = [...rows];
-            if (r.indexOf(target) % 2 === 0){
-                style.backgroundColor = pallete.primary;
-            }
             target.removeAttribute("selected");
             selectedRow = selectedRow.filter(el => el !== vertIndex);
         }
@@ -434,8 +423,15 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         table.appendChild(row);
         row.style.backgroundColor = pallete.bg_light;
-        if (rows.length % 2 !== 0){
-            row.style.backgroundColor = pallete.primary;
+        row.style.borderBottom = `1px ${pallete.gray} solid`;
+        row.style.transition = `0.3s all linear`
+        row.onmouseover = () => {
+            row.style.backgroundColor = pallete.green_light;
+        }
+        row.onmouseleave = () => {
+            if (row.getAttribute("selected") == null){
+                row.style.backgroundColor = pallete.bg_light;
+            }
         }
         vertInd++;
     }
@@ -509,24 +505,6 @@ document.addEventListener("DOMContentLoaded", function() {
         hideEmptySlide();
         uploadJson();
         window.location.reload();
-    }
-
-    let restyleRows = () => {
-        let r = [...rows];
-        r.forEach((row, index) => {
-            let childs = [...row.getElementsByTagName("div")];
-            childs.forEach((child) => {
-                child.setAttribute("vertIndex", index - 1)
-            })
-            row.color = pallete.text;
-            if (index === 0){
-                row.style.backgroundColor = pallete.bg_dark;
-            } else if (index % 2 === 0) {
-                row.style.backgroundColor = pallete.primary;
-            } else {
-                row.style.backgroundColor = pallete.bg_light;
-            }
-        })
     }
 
     let initBtns = () => {

@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 case "address" : {
                     secondaryMap = this.names;
-                    primaryField = getCompanyName(row);
+                    primaryField = getFullName(row);
                     primaryMap = this.addresses;
                     secondaryField = getPhone(row);
                     break;
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 case "phone" : {
                     secondaryMap = this.addresses;
                     primaryField = getAddress(row);
-                    secondaryField = getCompanyName(row);
+                    secondaryField = getFullName(row);
                     primaryMap = this.phones;
                     break;
                 }
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function() {
         deleteData = (row) => {
             delete this.phones[getPhone(row)];
             delete this.addresses[getAddress(row)];
-            delete this.names[getCompanyName(row)];
+            delete this.names[getFullName(row)];
         }
 
         clean = () => {
@@ -241,6 +241,7 @@ document.addEventListener("DOMContentLoaded", function() {
             row.removeAttribute("selected");
             row.style.backgroundColor = pallete.bg_light;
         }
+        checkDisabled();
     }
 
     let hideModal = (e, modal) => {
@@ -325,7 +326,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return row.getElementsByTagName("div")[horInd];
     }
 
-    let getCompanyName = (row) => {
+    let getFullName = (row) => {
         return getColumnInRow(row, 0).innerText;
     }
 
@@ -438,7 +439,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let uploadJson = () => {
         let oReq = new XMLHttpRequest();
-
         oReq.onload = function(e) {
             let resp = e.currentTarget.response;
             resp.forEach(elem => {
@@ -446,20 +446,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 let phone = elem['phone'];
                 let fullName = elem['full_name'];
                 storage.addNewRecord(fullName, phone, address);
+                storage.refreshStorage();
+                window.location.reload();
             });
         }
         oReq.open("GET", requestURL);
         oReq.responseType = "json";
         oReq.send();
-        // fetch(requestURL).then((response) => response.json()).then((data) => {
-        // data.forEach(elem => {
-        //     let address = elem['address'];
-        //     let phone = elem['phone'];
-        //     let fullName = elem['full_name'];
-        //     createRow(elem);
-        //     storage.addNewRecord(fullName, phone, address);
-        // });
-        storage.refreshStorage();
     };
 
     let buildTableFromStorage = () => {
@@ -504,7 +497,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         hideEmptySlide();
         uploadJson();
-        window.location.reload();
     }
 
     let initBtns = () => {
@@ -578,8 +570,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 table.removeChild(elem);
             });
             r = [...rows]
-            if (r.length === 1) showEmptySlide();
-            restyleRows();
+            if (r.length === 1) showEmptySlide();;
             checkDisabled(e);
         }
         fileBtn.onchange = (e) => {

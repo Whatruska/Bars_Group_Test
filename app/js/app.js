@@ -447,9 +447,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 let fullName = elem['full_name'];
                 storage.addNewRecord(fullName, phone, address);
                 storage.refreshStorage();
-            }).then(
-                window.location.reload()
-            );
+            })
+            window.location.reload()
         }
         oReq.open("GET", requestURL);
         oReq.responseType = "json";
